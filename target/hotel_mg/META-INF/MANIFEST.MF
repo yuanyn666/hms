@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Implementation-Title: hotel_mg Maven Webapp
+Implementation-Version: 1.0-SNAPSHOT
+Built-By: Yuan-King
+Implementation-Vendor-Id: hotel_mg
+Created-By: IntelliJ IDEA
+Build-Jdk: 1.8.0_144
+Main-Class: ${start-class}
+

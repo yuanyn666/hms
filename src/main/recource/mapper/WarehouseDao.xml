@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hms.dao.WarehouseDao">
+    <resultMap id="warehouseDOMap" type="WarehouseDO">
+        <id property="id" column="id" />
+        <result property="warehouseName" column="warehouse_name" />
+        <result property="warehouseCode" column="warehouse_code" />
+        <result property="address" column="address" />
+        <result property="createDate" column="create_date" />
+        <result property="userId" column="warehouse_mg" />
+        <result property="status" column="status" />
+        <result property="score" column="score" />
+        <result property="tel" column="tel" />
+    </resultMap>
+
+    <sql id="doWarehouseQueryParams">
+        <if test="warehouseCode!=null and warehouseCode!=''">
+            and warehouse_Code= #{warehouseCode}
+        </if>
+        <if test="status!=null">
+            and status= #{status}
+        </if>
+        <if test="warehouseName!=null">
+            AND   warehouse_name like CONCAT('%', '${warehouseName}', '%')
+        </if>
+        <if test="address!=null">
+            and address= #{address}
+        </if>
+        <if test="score!=null">
+            and score= #{score}
+        </if>
+        <if test="createBeginDate!=null and createBeginDate!=''">
+            AND create_date &gt;= #{createBeginDate}
+        </if>
+        <if test="createEndData!=null and createEndData!=''">
+            AND create_date &lt;= #{createEndDate}
+        </if>
+    </sql>
+
+    <select id="queryByName" resultMap="warehouseDOMap">
+        select *
+        from warehouse
+        <where>
+            <if test="warehouseName != null ">warehouse_name like  CONCAT('%', '${warehouseName}', '%')</if>
+        </where>
+    </select>
+
+    <select id="queryByCodes" resultMap="warehouseDOMap" >
+        select *
+        from warehouse
+        where
+        <choose>
+        <when test="list!=null and list.size()>0">
+        warehouse_code in
+        <foreach collection="list" item="item" open="(" close=")"
+                 separator=",">
+            #{item}
+        </foreach>
+        </when>
+        <otherwise>
+            1=0
+        </otherwise>
+        </choose>
+    </select>
+
+    <select id="query" resultMap="warehouseDOMap" parameterType="com.hms.query.WarehouseQuery">
+        select *
+        from warehouse<where>
+        <include refid="doWarehouseQueryParams"></include>
+    </where>
+        order by ${order} desc limit #{begin},#{num}
+    </select>
+
+    <select id="count"  resultType="java.lang.Integer" parameterType="com.hms.query.WarehouseQuery">
+        select count(1)        from warehouse
+        <where> <include refid="doWarehouseQueryParams"></include> </where>
+    </select>
+
+    <insert id="saveGuestRoomDO" parameterType="GuestRoomDO">
+        insert into guest_room(id,warehouse_name,warehouse_code,address,warehouse_mg,create_date,status,score,tel)
+        values(#{id},#{wahouseName},#{warehouseCode},#{address},#{warehouseMg},#{createDate},#{status},#{score},#{tel})
+    </insert>
+
+    <update id="updateWarehouse">
+        update warehouse set status = -1 where <if test="warehouseCode!=null">
+        warehouse_code=#{warehouseCode}
+    </if><if test="warehouseCode==null">1=0</if>
+    </update>
+</mapper>
